@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IWOA Demo</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <p class="eyebrow">Intelligent Work Order Assistant</p>
+      <h1>智能工单助手 Demo</h1>
+      <p class="subtitle">演示 Agent 理解用户请求、调用 Java 业务接口并返回业务结果。</p>
+      <div id="status-strip" class="status-strip status-pending" aria-live="polite" aria-label="模型状态">
+        <span id="status-badge" class="status-badge">Checking</span>
+        <span id="status-text" class="status-text">正在检查 Agent、模型配置与后端连接状态...</span>
+      </div>
+    </section>
+
+    <section class="chat-card">
+      <div id="messages" class="messages">
+        <article class="message assistant">
+          <p>可以试试这些输入：</p>
+          <p><code>帮我看看 T-1001 现在是谁负责</code></p>
+          <p><code>给 T-1001 添加评论：客户已补充付款截图</code></p>
+          <p><code>帮我检查 O-9002 能不能退款</code></p>
+        </article>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <textarea id="message-input" placeholder="输入你的工单或订单请求..." rows="3"></textarea>
+        <button type="submit">发送</button>
+      </form>
+
+      <p class="footnote">默认调用 <code>http://localhost:8000/chat</code>，由 Agent 协调 qwen-plus 与后端业务接口。</p>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

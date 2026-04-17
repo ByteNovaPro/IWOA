@@ -1,0 +1,10 @@
+backend/config/application-local.yml
+backend/.env
+agent-service/.env
+agent-service/config/model.local.json
+.env
+.DS_Store
+.vscode/
+backend/target/
+agent-service/.venv/
+__pycache__/

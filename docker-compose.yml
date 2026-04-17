@@ -1,0 +1,75 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: iwoa-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-iwoa}
+      MYSQL_USER: ${MYSQL_USERNAME:-iwoa_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-change_me}"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+    container_name: iwoa-backend
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-iwoa}
+      MYSQL_USERNAME: ${MYSQL_USERNAME:-iwoa_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  agent:
+    build:
+      context: ./agent-service
+    container_name: iwoa-agent
+    environment:
+      BACKEND_BASE_URL: http://backend:8080
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      DASHSCOPE_BASE_URL: ${DASHSCOPE_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      DASHSCOPE_MODEL: ${DASHSCOPE_MODEL:-qwen-plus}
+    ports:
+      - "8000:8000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: iwoa-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      agent:
+        condition: service_healthy
+
+volumes:
+  mysql-data:
